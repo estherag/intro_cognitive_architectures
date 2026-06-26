@@ -59,10 +59,6 @@ Compare the detected objects with the room classification reported by the cognit
 
 ## Troubleshooting: Arm in the camera field of view
 
-If the arm hasn't move up during the lauch process, you can easily move it up with:
-
-## Troubleshooting: Arm Occluding the Camera
-
 If the arm does not move out of the camera field of view during launch, YOLO detections may be degraded because the robot sees its own arm instead of the environment. You can manually move the arm to a neutral position using:
 
 ```bash
