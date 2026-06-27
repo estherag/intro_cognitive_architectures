@@ -3,7 +3,7 @@ export pkg_dir=~/ros2_ws
 
 
 cd $pkg_dir/src
-git clone -b 4.5.1 --depth 1  https://github.com/mgonzs13/yolo_ros.git
+git clone -b 4.5.1 --depth 1 https://github.com/mgonzs13/yolo_ros.git $pkg_dir/src/yolo_ros
 git clone -b ros2-jazzy https://github.com/Juancams/aws-robomaker-small-house-world.git $pkg_dir/src/aws-robomaker-small-house-world
 
 cd $pkg_dir
