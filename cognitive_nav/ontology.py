@@ -20,49 +20,55 @@ def load_ontology():
         class Sofa(PhysicalObject):
             pass
 
-        # TODO:
-        # Define additional object classes that can be detected by YOLO.
-        #
-        # Examples:
-        #   Bed
-        #   TV
-        #   Chair
-        #   DiningTable
-        #   Cup
-        #   Fridge
-        #   Oven
-        #
+        class TV(PhysicalObject):
+            pass
+
+        class Bed(PhysicalObject):
+            pass
+
+        class Chair(PhysicalObject):
+            pass
+
+        class DiningTable(PhysicalObject):
+            pass
+
+        class Fridge(PhysicalObject):
+            pass
+
+        class Cup(PhysicalObject):
+            pass
+
+        class Oven(PhysicalObject):
+            pass
 
         # Rooms
-
         class LivingRoom(Room):
             pass
 
-        # TODO:
-        # Define additional room types.
-        #
-        # Examples:
-        #   Bedroom
-        #   Kitchen
-        #   DiningRoom
-        #
+        class Bedroom(Room):
+            pass
 
-        
+        class Kitchen(Room):
+            pass
+
+        class DiningRoom(Room):
+            pass
+
+
         # Classification rules
 
         # TODO:
         # Add OWL equivalence rules that allow the reasoner
         # to infer the room type from the observed objects.
-        #
+
         # Example:
-        #
         # LivingRoom.equivalent_to.append(
         #     Room
         #     & contains.some(Sofa)
         # )
 
         # Example rule:
-        #
+
         # Bedroom.equivalent_to.append(
         #     Room
         #     & contains.some(Bed)
@@ -70,5 +76,6 @@ def load_ontology():
 
         # Try to make your rules specific enough to avoid
         # confusing one room with another.
+
 
     return onto

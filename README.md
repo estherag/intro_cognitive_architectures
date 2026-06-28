@@ -9,18 +9,35 @@ In session, we will build a simple cognitive system for a robot operating inside
 
 ## Install
 
-Get all the dependancies executing the `install.sh` script.
+Install all the required dependencies by running:
 
 ```bash
 chmod +x install.sh
 ./install.sh
 ```
 
-## Exercises
+The script adds the repositories required for the cognitive architecture tutorial to the ROS 2 workspace created during the previous ROS 2 session.
 
-TODO<link to exercises>
+If you do **NOT** already have the simulator installed, also run:
 
-Some proposed solutions are available in <here>
+```bash
+wget https://raw.githubusercontent.com/IntelligentRoboticsLabs/docker_infrastructure/main/docker/installation_scripts/simulator.sh
+chmod +x simulator.sh
+./simulator.sh
+```
+
+## Tutorial
+
+
+The tutorial consists of three guided exercises that progressively build a simple cognitive architecture:
+
+- [Exercise 1: Symbolic Reasoning](https://github.com/estherag/intro_cognitive_architectures/blob/main/exercises/exercise1.md)
+- [Exercise 2: Knowledge Management Under Uncertainty](https://github.com/estherag/intro_cognitive_architectures/blob/main/exercises/exercise2.md)
+- [Exercise 3: Goal Management and Decision Making](https://github.com/estherag/intro_cognitive_architectures/blob/main/exercises/exercise3.md)
+
+## Solutions
+
+Reference implementations for all exercises are available in the [`solutions`](https://github.com/estherag/intro_cognitive_architectures/tree/main/solutions) directory.
 
 ## Setup
 
@@ -46,7 +63,7 @@ Navigate through different rooms and observe how the inferred room type changes 
 To inspect the raw detections produced by the perception system:
 
 ```bash
-ros2 topic echo /yolo/detections
+ros2 topic echo /yolo/detections_3d
 ```
 
 You may also visualize the annotated camera image:

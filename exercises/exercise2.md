@@ -1,24 +1,25 @@
-# Exercise 2: Symbolic Reasoning Under Uncertainty
+# Exercise 2: Knowledge Management Under Uncertainty
 
-In Exercise 1, the robot used an OWL ontology and a symbolic reasoner to infer room categories from the objects it observed. This approach assumes that observations are correct and that the robot can reason directly from the symbolic knowledge stored in the ontology.
+In Exercise 1, the robot used an OWL ontology and a symbolic reasoner to infer the type of room from the objects it observed. The reasoner could determine which room categories were logically consistent with the current observations.
 
-However, in uncertain environments:
+However, symbolic reasoning alone has an important limitation. It does not represent uncertainty or remember how strongly previous observations support a particular hypothesis.
 
-* Object detectors are not perfect
-* Some objects may be partially visible
-* Important objects may not be detected
-* Observations from the past may no longer be relevant
+In this exercise, you will extend the symbolic reasoning system with two additional cognitive capabilities:
 
-In this exercise, we will extend the symbolic reasoning system with two cognitive capabilities:
+1. **Belief management**, allowing the robot to maintain confidence values for different room hypotheses.
+2. **Memory decay**, allowing the robot to gradually forget outdated observations.
 
-1. **Belief management**, allowing the robot to represent confidence in its conclusions
-2. **Memory decay**, allowing the robot to gradually forget outdated observations
+The objective is to demonstrate another key idea behind cognitive architectures:
 
-## Knowledge management
+> Symbolic reasoning determines which hypotheses are possible, while a belief system represents how strongly each hypothesis is supported.
 
-Complete `knowledge_management_node.py`. First let's create a belief state storing confidence values for each room type.
+## Knowledge Management Node
 
-Example:
+The symbolic reasoning node from Exercise 1 publishes the inferred room category on `/symbolic/room_inference`.
+
+Complete `knowledge_management_node.py` to maintain and update the robot's belief state.
+
+The node already stores one belief value for each room:
 
 ```python
 room_beliefs = {
@@ -29,142 +30,94 @@ room_beliefs = {
 }
 ```
 
-These values will evolve over time as the robot gathers new observations. Use YOLO confidence
+## 1. Update the Belief State
 
-
-### 1. Use YOLO Confidence Scores
-
-In Exercise 1, every detected object contributed equally to the ontology. In reality, detections have different confidence values. The robot should use these confidence values as evidence supporting room hypotheses.
+Whenever the symbolic reasoner infers a room category, increase the corresponding belief value.
 
 For example:
 
 ```text
-Detected:
-    Sofa (0.95)
+Symbolic inference:
+    LivingRoom
 
-Evidence:
-    LivingRoom += 0.95
+Belief update:
+    LivingRoom += 1
 ```
 
-Higher-confidence detections should contribute more strongly than uncertain detections.
+Complete the `update_beliefs()` function.
 
-### 2. Combine Symbolic Inference and Beliefs
+## 2. Forget Old Evidence
 
-The ontology still performs symbolic reasoning, for example, after observing a sofa and a TV the OWL reasoner may infer it is in the living room.
+Without forgetting, beliefs continue accumulating evidence even after the robot moves to another room.
 
-The belief layer should then increase confidence in the inferred room category.
+Implement a simple memory decay mechanism by multiplying every belief value by a constant factor at each cognitive cycle.
+
+Example:
+
+```python
+DECAY = 0.8
+
+for room in room_beliefs:
+    room_beliefs[room] *= DECAY
+```
+
+Complete the `apply_decay()` function.
+
+Experiment with different values of `DECAY`.
+
+| Decay factor | Behaviour                                               |
+| ------------ | ------------------------------------------------------- |
+| 0.95         | Slow forgetting; stable beliefs                         |
+| 0.80         | Balanced adaptation                                     |
+| 0.50         | Rapid forgetting; reacts mainly to current observations |
+
+## 3. Publish the Belief State
+
+Instead of making a decision, publish the complete belief state so that it can be used by other cognitive components.
+
+For simplicity, publish the belief dictionary as a JSON string on `/knowledge/beliefs`. Complete the `publish_beliefs()` function.
 
 Example:
 
 ```text
-Inferred:
-    LivingRoom
-
-Belief:
-    LivingRoom += 1.75
+{
+    "LivingRoom": 1.80,
+    "Kitchen": 0.30,
+    "Bedroom": 0.00,
+    "DiningRoom": 0.00
+}
 ```
-
-where the value depends on the confidence of the contributing detections.
-
-There is a separation between the two layers as the symbolic reasoner answers:
-
-> Which room categories are possible?
-
-while the belief layer answers:
-
-> Which room category is most likely?
-
-Note on normalisation: Belief values are not probabilities and do not need to sum to 1. What matters is the relative ranking between room hypotheses. However, if values grow without bound over time, thresholds become meaningless. This is addressed in the next section via memory decay.
-
-### 3. Forget Old Evidence
-
-Currently, room beliefs will continuously accumulate evidence.This causes a problem. Imagine the robot first observes a sofa and a TV and later moves to a kitchen. Without forgetting, the robot may continue believing it is in a living room long after leaving it.
-
-Let's implement a memory decay mechanism so at every cognitive cycle, the influence of old observations is gradually reduced. For example:
-
-Initially:
-
-```text
-LivingRoom = 1.80
-```
-
-After several cycles without observing living room objects:
-
-```text
-LivingRoom = 1.44
-LivingRoom = 1.15
-LivingRoom = 0.92
-LivingRoom = 0.74
-...
-```
-
-The decay factor controls how quickly the robot forgets. There is a fundamental tradeoff:
-
-| Decay factor | Behaviour |
-|---|---|
-| Close to 1.0 (e.g. 0.98) | Slow forgetting; stable in a single room, slow to adapt after moving |
-| Moderate (e.g. 0.80) | Forgets old evidence within ~10 cycles; reasonable for a moving robot |
-| Close to 0.0 (e.g. 0.30) | Rapid forgetting; almost no memory, reacts to current observations only |
-
-**Experiment:** run the simulation with `λ = 0.95` and then with `λ = 0.50`. Observe how quickly the robot adapts after moving between rooms. Note your observations.
-
-### 4. Decision Making
-
-Determine the room with the highest belief value. The room in which the robot is should be reported only if the confidence is high enough. The robot should avoid making strong conclusions when evidence is insufficient.
 
 ## Running the Exercise
 
-Let's test the cognitive system in simulation. Start the house environment as described in the README.
+Start the house environment:
 
-Open a new terminal and launch the symbolic reasoning node:
+```bash
+source venv_cogarchs/bin/activate
+ros2 launch cognitive_nav mirte_house.launch.py
+```
+
+Use keyboard teleoperation to move the robot:
+
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+
+Launch the symbolic reasoning node:
 
 ```bash
 source venv_cogarchs/bin/activate
 ros2 run cognitive_nav symbolic_node
 ```
 
-The node will subscribe to object detections, populate the ontology, execute the reasoner, and report the inferred room type.
+Then launch the knowledge management node:
 
 ```bash
 source venv_cogarchs/bin/activate
 ros2 run cognitive_nav knowledge_management_node
 ```
 
-Observe how symbolic classifications and room beliefs evolve over time.
+Move the robot through different rooms and observe how the belief values evolve as the robot explores the environment.
 
-Example:
+Experiment with different decay factors and compare how quickly the robot adapts after moving between rooms.
 
-```text
-Added 'sofa_1'
-Added 'tv_2'
-
-Inferred classes:
-    Room
-    LivingRoom
-
-Beliefs:
-    LivingRoom = 1.72
-    Kitchen = 0.00
-    Bedroom = 0.00
-
-I am in a LivingRoom.
-```
-
-Later:
-
-```text
-Beliefs:
-    LivingRoom = 0.74
-    Kitchen = 0.62
-
-I am not sure where I am.
-```
-
-## Discussion
-
-After completing the exercise, consider the following questions:
-
-1. Why are confidence values useful even when an ontology is available?
-2. What happens if the robot never forgets?
-3. What happens if memory decay is too strong?
-4. How can beliefs help resolve ambiguity?

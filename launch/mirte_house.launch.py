@@ -130,7 +130,7 @@ def generate_launch_description():
         'input_depth_topic': '/rgbd_camera/depth_image',
         'input_depth_info_topic': '/rgbd_camera/camera_info',
         'target_frame': 'camera_link',
-        'use_3d': 'False',
+        'use_3d': 'True',
         'use_tracking': 'True',
     }.items(),
   )
