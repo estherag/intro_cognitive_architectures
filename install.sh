@@ -23,7 +23,7 @@ pip install \
     "typing-extensions>=4.4.0" \
     "ultralytics==8.4.6" \
     "lap>=0.5.12" \
-    owlready
+    owlready2
 
 # Install dependencies
 rosdep install --from-paths src --ignore-src -r -y
