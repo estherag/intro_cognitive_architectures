@@ -124,8 +124,3 @@ MODEL OK
 ```
 
 If not found, ultralytics will automatically download a copy of the model.
-
-```bash
-ros2 launch yolo_bringup yolo.launch.py   input_image_topic:=/rgbd_camera/image   input_depth_topic:=/rgbd_camera/depth_image   input_depth_info_topic:=/rgbd_camera/camera_info   target_frame:=camera_link   use_3d:=True   use_tracking:=True
-
-```
