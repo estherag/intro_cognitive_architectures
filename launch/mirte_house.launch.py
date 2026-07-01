@@ -132,6 +132,7 @@ def generate_launch_description():
         'target_frame': 'camera_link',
         'use_3d': 'True',
         'use_tracking': 'True',
+        'device': 'cpu',
     }.items(),
   )
 
